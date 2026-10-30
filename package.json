@@ -1,0 +1,16 @@
+{
+  "name": "turno-demo",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Planejador semanal de escalas \u2014 demonstra\u00e7\u00e3o de portf\u00f3lio com dados fict\u00edcios",
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "start": "node server.js",
+    "check": "node --check src/app.js && node --check src/domain.js && node --check src/i18n.js && node --check server.js && node --test tests/*.test.js",
+    "build": "node scripts/build.js"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
