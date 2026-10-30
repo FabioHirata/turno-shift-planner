@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { demoState, analyze, assign, restoreState, validState, csvCell, exportCSV, PEOPLE } from '../src/domain.js';
+import { demoState, analyze, assign, restoreState, validState, csvCell, exportCSV, PEOPLE, setAvailability, validAvailability } from '../src/domain.js';
 test('initial scenario exposes unavailable assignment and two missing shifts', () => {
   const r = analyze(demoState());
   assert.equal(r.covered, 12); assert.equal(r.conflicts.length, 1);
@@ -34,4 +34,15 @@ test('CSV escapes quotes, separators, multiline values and formula prefixes', ()
   for (const value of ['=1+1', '+CMD', '-1', '@SUM(1)', '\tformula', '\rtext', '\ntext', '  =1']) assert.equal(csvCell(value).startsWith('"\''), true);
   assert.equal(csvCell('Ana Lima'), '"Ana Lima"');
   const csv = exportCSV(demoState()); assert.ok(csv.startsWith('\uFEFF')); assert.equal(csv.split('\r\n').length, 5); assert.ok(csv.includes('"Ana Lima"'));
+});
+
+test('availability edits are immutable, validated and included in coverage', () => {
+  const initial = demoState(); const next = setAvailability(initial, 'clara', 1, []);
+  assert.deepEqual(initial.availability.clara[1], ['afternoon']);
+  assert.equal(analyze(next).covered, 13); assert.equal(analyze(next).conflicts.length, 0);
+  assert.throws(() => setAvailability(initial, 'clara', 8, []));
+  for (const shifts of [['off'], ['night'], ['morning','morning'], null]) assert.throws(() => setAvailability(initial, 'ana', 0, shifts));
+  assert.equal(validAvailability({ ...initial.availability, extra: {} }), false);
+  assert.equal(validAvailability({ ...initial.availability, ana: {'7': []} }), false);
+  assert.equal(restoreState(JSON.stringify(next)).availability.clara[1].length, 0);
 });

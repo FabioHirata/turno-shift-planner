@@ -2,8 +2,13 @@
 // Real rendering, browser focus behavior and downloads still require browser QA.
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { demoState, analyze, assign } from '../src/domain.js';
+const nativeFetch = globalThis.fetch;
+const flush = () => new Promise(resolve => setImmediate(resolve));
 let instance = 0;
-async function boot({ language = 'pt', stored = null, blocked = false } = {}) {
+async function boot({ language = 'pt', stored = null, blocked = false, mode = 'demo', fetcher = nativeFetch } = {}) {
+  globalThis.location = { search: mode === 'api' ? '?mode=api' : '' };
+  globalThis.fetch = fetcher;
   const elements = new Map();
   const created = [];
   class Element {
@@ -22,13 +27,14 @@ async function boot({ language = 'pt', stored = null, blocked = false } = {}) {
     close() { this.open = false; }
     click() { this.clicked = true; this.events.click?.(); }
   }
-  const ids = ['language','save-status','coverage-number','coverage-bar','hours-number','conflict-number','conflict-caption','schedule','coverage','issues','announcement','export','reset','reset-dialog','cancel-reset','confirm-reset'];
+  const ids = ['mode-title','mode-description','mode-link','api-message','api-retry','planner','metrics','lower-panels','availability-list','availability-person','availability-day','availability-shifts','availability-save','language','save-status','coverage-number','coverage-bar','hours-number','conflict-number','conflict-caption','schedule','coverage','issues','announcement','export','reset','reset-dialog','cancel-reset','confirm-reset'];
   for (const id of ids) { const el = new Element('div'); el.id = id; }
   const storage = new Map([['turno.language', language]]); if (stored !== null) storage.set('turno.demo.v1', stored);
   globalThis.localStorage = { getItem: k => { if (blocked) throw Error('blocked'); return storage.get(k) ?? null; }, setItem: (k,v) => { if (blocked) throw Error('blocked'); storage.set(k,v); } };
   globalThis.NodeFilter = { SHOW_TEXT: 4 };
   globalThis.document = { body: new Element('body'), documentElement: {}, createTreeWalker: () => ({ nextNode: () => false }), querySelectorAll: () => [], getElementById: id => elements.get(id), createElement: tag => { const el = new Element(tag); created.push(el); return el; } };
   await import(`../src/app.js?test=${++instance}`);
+  await flush();
   return { get: id => elements.get(id), storage, created, change(id, value) { const el = elements.get(id); el.value = value; el.events.change(); } };
 }
 test('UI renders initial metrics and handles edits with focus and persistence', async () => {
@@ -84,4 +90,45 @@ test('export event creates a localized CSV Blob and download link', async () => 
     assert.equal(blob.type, 'text/csv;charset=utf-8');
     assert.match(ui.get('announcement').textContent, /CSV/);
   } finally { URL.createObjectURL = create; URL.revokeObjectURL = revoke; globalThis.setTimeout = timeout; }
+});
+
+test('availability editor updates coverage without altering assignments', async () => {
+  const ui = await boot();
+  ui.change('availability-person', 'clara'); ui.change('availability-day', '1');
+  assert.equal(ui.get('availability-shifts').value, 'afternoon');
+  ui.get('availability-shifts').value = 'none'; ui.get('availability-save').click();
+  assert.equal(ui.get('coverage-number').textContent, '13 / 14');
+  assert.equal(ui.get('clara-1').value, 'afternoon');
+  assert.equal(JSON.parse(ui.storage.get('turno.demo.v1')).availability.clara['1'].length, 0);
+});
+
+const apiResponse = (state = demoState(), revision = 1) => ({ ok: true, status: 200, json: async () => ({ ...state, revision, week: '2026-11-02', report: analyze(state) }) });
+test('API UI loads backend only, sends PATCH and never stores backend schedule in browser', async () => {
+  let server = demoState(), revision = 1; const calls = [];
+  const ui = await boot({ mode: 'api', fetcher: async (url, options) => {
+    calls.push({url, method:options.method});
+    if (options.method === 'PATCH') { const body = JSON.parse(options.body); assert.equal(body.revision, revision); server = assign(server,body.personId,body.day,body.shift); revision++; }
+    return apiResponse(server, revision);
+  }});
+  assert.equal(ui.get('planner').hidden, false); assert.equal(ui.get('mode-title').textContent, 'API Go local');
+  assert.equal(calls.length, 1); assert.equal(calls[0].method, 'GET');
+  ui.change('davi-6','afternoon'); await flush();
+  assert.equal(ui.get('coverage-number').textContent, '13 / 14');
+  assert.equal(calls[1].method, 'PATCH'); assert.equal(ui.storage.has('turno.demo.v1'), false);
+});
+test('API UI stale write refreshes authoritative state and does not silently retry', async () => {
+  let count = 0; const server = assign(demoState(), 'davi', 6, 'afternoon');
+  const ui = await boot({ mode: 'api', fetcher: async (_, options) => {
+    count++;
+    if (options.method === 'PATCH') return {ok:false,status:409};
+    return count === 1 ? apiResponse() : apiResponse(server, 2);
+  }});
+  ui.change('ana-0','off'); await flush();
+  assert.equal(count, 3); assert.equal(ui.get('ana-0').value,'morning'); assert.equal(ui.get('davi-6').value,'afternoon');
+  assert.match(ui.get('api-message').textContent,/Outra janela/);
+});
+test('API unavailable leaves editing hidden and does not fall back to fake server data', async () => {
+  const ui = await boot({mode:'api',fetcher:async()=>{throw Error('offline');}});
+  assert.equal(ui.get('planner').hidden,true); assert.equal(ui.get('export').disabled,true);
+  assert.equal(ui.get('api-retry').hidden,false); assert.match(ui.get('api-message').textContent,/API indisponível/);
 });

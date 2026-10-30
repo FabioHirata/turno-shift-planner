@@ -3,6 +3,28 @@ export const DAYS_LOCAL = { pt: ['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'], en
 export const SHIFT_LOCAL = { pt: {off:'Folga',morning:'Manhã',afternoon:'Tarde'}, en: {off:'Off',morning:'Morning',afternoon:'Afternoon'}, ja: {off:'休み',morning:'早番',afternoon:'遅番'} };
 // Source Portuguese phrases double as stable keys. Every entry has EN and JA.
 export const COPY = {
+ 'API desconectada':['API disconnected','API未接続'],
+ 'Modo de execução':['Execution mode','動作モード'],
+ 'Demonstração local':['Local demonstration','ローカルデモ'],
+ 'API Go local':['Local Go API','ローカルGo API'],
+ 'Dados salvos somente neste navegador.':['Data saved only in this browser.','データはこのブラウザのみに保存されます。'],
+ 'Usar API Go local':['Use local Go API','ローカルGo APIを使う'],
+ 'Voltar à demonstração':['Back to demo','デモに戻る'],
+ 'Persistência no servidor local · revisão':['Local server persistence · revision','ローカルサーバーに保存 · リビジョン'],
+ 'Tentar conexão novamente':['Retry connection','再接続'],
+ 'Sincronizando com API Go…':['Syncing with Go API…','Go APIと同期中…'],
+ 'Estado confirmado pela API Go':['State confirmed by Go API','Go APIで確認済み'],
+ 'Disponibilidade do cenário fictício. Edite abaixo.':['Availability for this fictional scenario. Edit below.','架空のシナリオの勤務条件です。以下で編集できます。'],
+ 'Pessoa':['Person','担当者'], 'Dia':['Day','曜日'], 'Indisponibilidade':['Unavailable shifts','勤務不可のシフト'],
+ 'Nenhuma':['None','なし'], 'Manhã':['Morning','早番'], 'Tarde':['Afternoon','遅番'], 'Dia inteiro':['Whole day','終日'],
+ 'Salvar disponibilidade':['Save availability','勤務条件を保存'],
+ 'Disponibilidade atualizada.':['Availability updated.','勤務条件を更新しました。'],
+ 'Conectando à API Go local…':['Connecting to local Go API…','ローカルGo APIに接続中…'],
+ 'API indisponível. Inicie o servidor Go e abra esta página no endereço dele. Nenhum dado de demonstração foi enviado.':['API unavailable. Start the Go server and open this page at its address. No demo data was sent.','APIに接続できません。Goサーバーを起動し、そのアドレスでこのページを開いてください。デモのデータは送信されていません。'],
+ 'Alteração confirmada pela API Go.':['Change confirmed by Go API.','Go APIで変更を確認しました。'],
+ 'Outra janela alterou a escala. Recarregamos o estado; revise antes de tentar novamente.':['Another window changed the schedule. We reloaded it; review before retrying.','別のウィンドウでシフトが変更されました。最新の状態を読み込みました。確認してから再度お試しください。'],
+ 'Não foi possível confirmar a alteração. Reconciliamos o estado quando possível; revise antes de tentar novamente.':['Could not confirm the change. We refreshed the state where possible; review before retrying.','変更を確認できませんでした。可能な場合は最新の状態を再取得しています。確認してから再度お試しください。'],
+
 'Ir para a escala':['Skip to schedule','シフト表へ移動'],
 'ESPAÇO DEMONSTRATIVO':['DEMO WORKSPACE','デモワークスペース'],
 'Ateliê Aurora':['Aurora Studio','アウロラ・スタジオ'],
@@ -13,7 +35,7 @@ export const COPY = {
 'FEITO PARA EXPLORAR':['BUILT TO EXPLORE','操作して試せるデモ'],
 'Menos planilha.':['Less spreadsheet.','表計算をもっとシンプルに。'],
 'Mais clareza na operação.':['More operational clarity.','チームの予定を、ひと目で。'],
-'Demo de portfólio · v1.0':['Portfolio demo · v1.0','ポートフォリオ用デモ · v1.0'],
+'Demo de portfólio · v2.0':['Portfolio demo · v2.0','ポートフォリオ用デモ · v2.0'],
 'Operação':['Operations','運用'],
 'Planejamento':['Planning','計画'],
 'Dados fictícios':['Fictional data','架空のデータ'],
@@ -53,8 +75,8 @@ export const COPY = {
 'Seg · manhã indisponível':['Mon · morning unavailable','月 · 早番は勤務不可'],
 'Referência da demo: até 40h por pessoa / semana.':['Demo guideline: up to 40 hours per person / week.','デモの基準：1人につき週40時間まで。'],
 'Um laboratório de planejamento.':['A planning sandbox.','シフト計画を試せる実験室。'],
-'Projeto demonstrativo de portfólio. Pessoas, negócio e escala são fictícios. Sem servidor, contas ou rastreamento. Não valida legislação trabalhista nem substitui revisão humana.':['A portfolio demonstration. All people, business details and schedules are fictional. No backend, accounts or tracking. Does not validate labor law or replace human review.','ポートフォリオ用のデモです。人物・店舗・シフトはすべて架空です。バックエンド、アカウント、追跡機能はありません。労働法への適合性を検証するものではなく、人による確認が必要です。'],
-'JavaScript nativo · Regras testáveis · Dados locais':['Vanilla JavaScript · Testable rules · Local data','素のJavaScript · テスト可能なルール · ローカルデータ'],
+'Projeto demonstrativo de portfólio. Pessoas, negócio e escala são fictícios. Demo no navegador ou API Go local, sem contas ou rastreamento. Não valida legislação trabalhista nem substitui revisão humana.':['A portfolio demonstration. All people, business details and schedules are fictional. Browser demo or local Go API, without accounts or tracking. Does not validate labor law or replace human review.','ポートフォリオ用のデモです。人物・店舗・シフトはすべて架空です。ブラウザのデモまたはローカルGo APIで動作し、アカウントや追跡機能はありません。労働法への適合性を検証するものではなく、人による確認が必要です。'],
+'Go + JavaScript · Regras testáveis · Dados locais':['Go + JavaScript · Testable rules · Local data','Go + JavaScript · テスト可能なルール · ローカルデータ'],
 'Restaurar a demonstração?':['Reset the demonstration?','デモをリセットしますか？'],
 'As edições desta escala serão substituídas pelo exemplo inicial.':['Your schedule changes will be replaced with the initial example.','編集したシフト表は初期データに置き換わります。'],
 'Manter edições':['Keep changes','変更を残す'], 'Restaurar':['Reset','リセット'],
@@ -79,7 +101,7 @@ export function gapText(day, shift, lang) {
 }
 export function conflictText(c, people, hours, lang) {
   const p = people.find(p => p.id === c.personId);
-  if (lang === 'pt') return c.text;
+  if (lang === 'pt') return c.type === 'hours' ? `${p.name}: ${hours[p.id]}h excedem o limite demonstrativo de 40h.` : `${p.name}: ${DAYS_LOCAL.pt[c.day]}, turno indisponível.`;
   if (c.type === 'hours') return lang === 'ja' ? `${p.name}：${hours[p.id]}時間はデモの週40時間の上限を超えています。` : `${p.name}: ${hours[p.id]}h exceeds the demo limit of 40h.`;
   return lang === 'ja' ? `${p.name}：${DAYS_LOCAL.ja[c.day]}曜日は選択したシフトに勤務できません。` : `${p.name}: unavailable for the selected shift on ${DAYS_LOCAL.en[c.day]}.`;
 }
